@@ -38,7 +38,7 @@ const ExpenseTable = ({
                   </td>
                 </tr>
               ) : (
-                expenses.map((expense) => (
+                (expenses || []).map((expense) => (
                   <tr key={expense.id}>
                     <td className="amount">₹{expense.amount}</td>
                     <td>

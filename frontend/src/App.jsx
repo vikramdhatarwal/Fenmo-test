@@ -19,7 +19,7 @@ const App = () => {
   const refreshCategories = useCallback(async () => {
     const data = await getExpenses();
     const unique = Array.from(
-      new Set(data.expenses.map((expense) => expense.category))
+      new Set((data?.expenses || []).map((expense) => expense.category))
     );
     setCategories(unique);
     return data;

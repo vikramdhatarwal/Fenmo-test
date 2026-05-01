@@ -1,7 +1,7 @@
 const express = require("express");
 const {
-	createExpense,
-	getExpenses,
+  createExpense,
+  getExpenses,
 } = require("../controllers/expenses.controller");
 
 const router = express.Router();
