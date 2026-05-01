@@ -1,6 +1,8 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? "http://localhost:3000" : window.location.origin);
+  (import.meta.env.DEV
+    ? "http://localhost:3000"
+    : "https://fenmo-test.onrender.com");
 
 // Generic response handler
 const handleResponse = async (response) => {
