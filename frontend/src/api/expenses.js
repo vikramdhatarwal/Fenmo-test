@@ -6,15 +6,44 @@ const API_BASE_URL =
 
 // Generic response handler
 const handleResponse = async (response) => {
-  const data = await response.json();
+  const contentType = response.headers.get("content-type") || "";
+  const rawBody = await response.text();
+
+  // If the server returned HTML (or any non-JSON) body, surface a clearer error
+  // that includes the URL and status so it's easier to debug deployment issues.
+  if (!contentType.includes("application/json")) {
+    if (!response.ok) {
+      const bodySnippet = rawBody ? rawBody.slice(0, 200) : "";
+      throw new Error(
+        `Request to ${response.url} failed with status ${response.status}. Non-JSON response: ${bodySnippet}`
+      );
+    }
+
+    // If response is OK but not JSON, this is unexpected — surface details.
+    throw new Error(
+      `Invalid non-JSON response from ${response.url} (status ${response.status})`
+    );
+  }
+
+  // At this point we expect JSON content-type. Try parsing and give helpful error.
+  let data;
+  try {
+    data = rawBody ? JSON.parse(rawBody) : null;
+  } catch (err) {
+    const bodySnippet = rawBody ? rawBody.slice(0, 200) : "";
+    throw new Error(
+      `Invalid JSON response from ${response.url}: ${err.message}. Body starts with: ${bodySnippet}`
+    );
+  }
 
   if (!response.ok) {
-    const message = data?.error?.message || "Request failed";
+    const message =
+      data?.error?.message || `Request to ${response.url} failed (${response.status})`;
     throw new Error(message);
   }
 
   if (!data?.success) {
-    throw new Error("API returned failure");
+    throw new Error(`API returned failure from ${response.url}`);
   }
 
   return data.data;
