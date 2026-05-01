@@ -19,7 +19,7 @@ const App = () => {
   const refreshCategories = useCallback(async () => {
     const data = await getExpenses();
     const unique = Array.from(
-      new Set((data?.expenses || []).map((expense) => expense.category))
+      new Set((data || []).map((expense) => expense.category))
     );
     setCategories(unique);
     return data;
@@ -33,8 +33,10 @@ const App = () => {
         const data = category
           ? await getExpenses(category)
           : await getExpenses();
-        setExpenses(data.expenses);
-        setTotal(data.total);
+        setExpenses(data);
+        setTotal(
+          data.reduce((sum, e) => sum + Number(e.amount || 0), 0).toFixed(2)
+        );
       } catch (err) {
         setErrorMessage(err.message || "Failed to load expenses");
       } finally {
@@ -50,8 +52,10 @@ const App = () => {
       setErrorMessage("");
       try {
         const data = await refreshCategories();
-        setExpenses(data.expenses);
-        setTotal(data.total);
+        setExpenses(data);
+        setTotal(
+          data.reduce((sum, e) => sum + Number(e.amount || 0), 0).toFixed(2)
+        );
       } catch (err) {
         setErrorMessage(err.message || "Failed to load expenses");
       } finally {
@@ -382,7 +386,7 @@ const App = () => {
           <div className="user-card">
             <div className="avatar">AM</div>
             <div>
-              <p className="user-name">Arjun Mehta</p>
+              <p className="user-name">Vikram</p>
               <span className="muted">Premium plan</span>
             </div>
           </div>
